@@ -1,17 +1,69 @@
+<a href="/admin">&larr; Back</a>
+
 <h3>Register</h3>
 <% if (messages.error) { %>
-    <div class="alert alert-danger" role="alert">
-        <%= messages.error %>
-    </div>
-  <% } %>
-<form action="/register" method="POST">
+  <div class="alert alert-danger" role="alert">
+      <%= messages.error %>
+  </div>
+<% } %>
+
+<form action="/register" method="POST" class="sign-up-form" onsubmit="return validateForm()">
 
   <label for="username"><b>Username</b></label>
-  <input type="text" placeholder="Enter Username" name="username">
+  <input type="text" placeholder="Enter Username" name="username" required>
 
   <label for="password"><b>Password</b></label>
-  <input type="password" placeholder="Enter Password" name="password">
+  <input type="password" placeholder="Enter Password" name="password" id="password" required>
 
-  <input type="submit" value="Register" class="btn">
+  <label for="confirm-password" class="sign-up-form-label"><b>Confirm Password</b></label>
+  <input type="password" id="confirm-password" placeholder="Re-enter Password" name="confirm-password" required>
+  <!-- Tempat pesan kesalahan akan ditampilkan -->
+  <div id="password-error" class="error-message"></div>
 
+  <input type="submit" value="Register" class="register-button" disabled> <!-- Defaultnya, tombol Register dinonaktifkan -->
 </form>
+
+<script>
+// Ambil elemen-elemen yang diperlukan dari formulir
+const passwordInput = document.getElementById('password');
+const confirmPasswordInput = document.getElementById('confirm-password');
+const submitButton = document.querySelector('.register-button'); // Mengambil tombol dengan class "register-button"
+const errorMessage = document.getElementById('password-error');
+
+// Fungsi untuk memeriksa kecocokan password
+function validatePassword() {
+  if (passwordInput.value !== confirmPasswordInput.value) {
+    errorMessage.textContent = 'Password does not match';
+    return false; // Batalkan pengiriman formulir jika password tidak cocok
+  } else {
+    errorMessage.textContent = '';
+    return true; // Lanjutkan pengiriman formulir jika password cocok
+  }
+}
+
+// Fungsi untuk memvalidasi formulir sebelum pengiriman
+function validateForm() {
+  if (!validatePassword()) {
+    return false; // Batalkan pengiriman formulir jika validasi password gagal
+  }
+  return true; // Lanjutkan pengiriman formulir jika semua validasi berhasil
+}
+
+// Tambahkan event listener ke kedua input
+passwordInput.addEventListener('input', function() {
+  validatePassword();
+  if (passwordInput.value === confirmPasswordInput.value) {
+    submitButton.removeAttribute('disabled'); // Menghapus atribut disabled jika password cocok
+  } else {
+    submitButton.setAttribute('disabled', 'true'); // Menambahkan atribut disabled jika password tidak cocok
+  }
+});
+confirmPasswordInput.addEventListener('input', function() {
+  validatePassword();
+  if (passwordInput.value === confirmPasswordInput.value) {
+    submitButton.removeAttribute('disabled'); // Menghapus atribut disabled jika password cocok
+  } else {
+    submitButton.setAttribute('disabled', 'true'); // Menambahkan atribut disabled jika password tidak cocok
+  }
+});
+</script>

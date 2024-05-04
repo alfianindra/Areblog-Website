@@ -13,9 +13,8 @@ const mainLayout = '../views/layouts/login';
 const adminLayout = '../views/layouts/admin';
 const jwtSecret = process.env.JWT_SECRET;
 
-
 // JWT cek login
-const authMiddleware = (req, res, next ) => {
+const authMiddleware = (req, res, next) => {
   const token = req.cookies.token;
 
   if(!token) {
@@ -44,11 +43,12 @@ router.get('/admin', async (req, res) => {
 });
 
 
+
 //mengecek login
 router.post('/admin', async (req, res) => {
   try {
     const { username, password } = req.body;
-    
+
     const user = await User.findOne({ username });
 
     // Periksa apakah pengguna ditemukan
@@ -129,26 +129,22 @@ router.get('/add-post', authMiddleware, async (req, res) => {
   } catch (error) {
     console.log(error);
   }
-
 });
 
 // Image upload configuration
 const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-      cb(null, './public/uploads');
+  destination: function (req, file, cb) {
+    cb(null, 'public/uploads');
   },
-  filename: function(req, file, cb) {
-      cb(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
   },
 });
 
 const upload = multer({ storage: storage }).single("image");
 
-/**
- * POST /
- * Admin - Create New Post
-*/
-router.post('/add-post', authMiddleware , upload, async (req, res) => {
+// POST create Post
+router.post('/add-post', authMiddleware, upload, async (req, res) => {
   try {
     if (!req.file) {
       throw new Error('No file uploaded');
@@ -158,7 +154,7 @@ router.post('/add-post', authMiddleware , upload, async (req, res) => {
       title: req.body.title,
       image: req.file.filename,
       body: req.body.body,
-      category: req.body.category 
+      category: req.body.category
     });
 
     await newPost.save();
@@ -168,7 +164,6 @@ router.post('/add-post', authMiddleware , upload, async (req, res) => {
     res.redirect('/error')
   }
 });
-
 
 // Get dari Post
 router.get('/edit-post/:id', authMiddleware, async (req, res) => {
@@ -192,7 +187,6 @@ router.get('/edit-post/:id', authMiddleware, async (req, res) => {
 
 });
 
-
 // put untuk Post
 router.put('/edit-post/:id', authMiddleware,upload, async (req, res) => {
   try {
@@ -202,7 +196,7 @@ router.put('/edit-post/:id', authMiddleware,upload, async (req, res) => {
     if (req.file) {
       new_image = req.file.filename;
       try {
-        fs.unlinkSync('../uploads/' + req.body.old_image);
+        fs.unlinkSync(path.join(__dirname, '../public/uploads/', req.body.old_image));
       } catch (err) {
         console.log(err);
       }
@@ -214,7 +208,9 @@ router.put('/edit-post/:id', authMiddleware,upload, async (req, res) => {
       user: req.session.user,
       title: req.body.title,
       image: new_image,
+      image: new_image,
       body: req.body.body,
+      category: req.body.category,
       category: req.body.category,
       updatedAt: Date.now()
     });
@@ -249,21 +245,25 @@ router.post('/register', async (req, res) => {
     const { username, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Cek apakah username sudah ada dalam database
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      req.flash('error', 'Username telah dipakai');
+      return res.redirect('register'); // Ganti dengan path menuju halaman registrasi
+    }
+    
     try {
-      const user = await User.create({ username, password:hashedPassword });
-      res.flash('success', 'User dibuat')
-      setTimeout(function() {
-        res.redirect('/admin'); 
-      }, 3000);
+      const user = await User.create({ username, password: hashedPassword, role });
+      req.session.user = user; // Set req.session.user saat pengguna berhasil mendaftar
+      const token2 = jwt.sign({ userId: user._id }, jwtSecret);
+      res.cookie('token', token2, { httpOnly: true });
+      res.redirect('/admin');
     } catch (error) {
-      if(error.code === 11000) {
-        req.flash('error', 'Username sudah dipakai');
-      }
-      res.redirect('/register')
+      res.redirect('/error')
     }
 
   } catch (error) {
-    console.log(error);
+    res.redirect('/error');
   }
 });
 
@@ -272,7 +272,7 @@ router.post('/register', async (req, res) => {
 router.delete('/delete-post/:id', authMiddleware, async (req, res) => {
 
   try {
-    await Post.deleteOne( { _id: req.params.id } );
+    await Post.deleteOne({ _id: req.params.id });
     res.redirect('/dashboard');
   } catch (error) {
     console.log(error);
@@ -345,7 +345,7 @@ router.delete('/delete-post/:id', authMiddleware, async (req, res) => {
       res.redirect('/profile');
     } catch (error) {
       console.log(error);
-      res.status(500).json({ message: 'Internal server error' });
+      res.redirect('/error')
     }
   });
 

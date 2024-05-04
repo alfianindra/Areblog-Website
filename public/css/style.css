@@ -42,21 +42,80 @@ textarea {
   margin-bottom: 1rem;
 }
 
-.btn {
-  background-color: var(--black);
-  border: none;
-  color: white; 
-  padding: 16px 32px;
+/* Gaya Post */
+.post {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.post a {
+  color: #333;
   text-decoration: none;
-  margin: 4px 2px; 
+  font-weight: bold;
+  font-size: 18px;
+  margin-left: 18px; /* Menambahkan margin kanan */
+}
+
+.post a:hover {
+  color: #555;
+  text-decoration: underline;
+}
+
+/* Tombol Tambah Baru */
+.btn-add-new {
+  background-color: #000000;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease;
   cursor: pointer;
 }
 
-.btn-delete {
-  padding: 10px 16px;
-  background-color: var(--red);
+.btn-add-new:hover {
+  background-color: #333333;
 }
 
+/* Tombol Edit */
+.btn-edit {
+  background-color: #4f3522 !important; /* Ubah warna latar belakang menjadi coklat */
+  color: white !important; /* Ubah warna teks menjadi putih */
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 15px !important;
+  font-weight: 300 !important;
+}
+
+.btn-edit:hover {
+  background-color: #3d2f29 !important; /* Warna latar belakang saat dihover */
+}
+
+
+/* Tombol Hapus */
+.btn-delete {
+  background-color: #f44336;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 18px;
+}
+
+.btn-delete:hover {
+  background-color: #d32f2f;
+}
 
 .img-big {
   width: 100%;
@@ -119,13 +178,8 @@ textarea {
   grid-area: menu;
 }
 
-.header_a_nav {
-  display: flex;
-  grid-area: menu;
-  justify-content: right;
-}
 
-.header__logo, .header__nav, .header__button, .header_a_nav {
+.header__logo, .header__nav, .header__button {
   width: 100%;
 }
 
@@ -167,7 +221,7 @@ textarea {
   text-decoration: none;
 }
 
-.header__nav ul li a.active, .header_a_nav ul li a.active {
+.header__nav ul li a.active {
   color: #7E7E7E;
 }
 
@@ -175,11 +229,6 @@ textarea {
   text-decoration: underline;
 }
 
-.header_a_nav{
-  display: flex;
-  grid-area: menu;
-  justify-content: right;
-}
 
 /* Author - HomePage */
 .author {
@@ -340,6 +389,7 @@ textarea {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  
 }
 
 .footer__left {
@@ -486,105 +536,169 @@ textarea {
   max-height: 200px; 
 }
 
-/* Gaya untuk judul form */
-.sign-in-form {
+/* Gaya untuk judul sign-in */
+.sign-in-form h3 {
   margin-top: 20px;
   margin-bottom: 10px;
-  font-size: 32px; /* Atur ukuran font sesuai kebutuhan */
+  font-size: 32px; /* Besarkan ukuran font judul sign-in */
 }
 
-/* Gaya untuk label */
-.sign-in-form-label {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 20px;
-}
-
-/* Gaya untuk input */
-.sign-in-form-input {
-  width: 100%;
-  padding: 10px; /* Sesuaikan padding sesuai kebutuhan */
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-/* Gaya untuk tombol */
-.sign-in-form input[type="submit"] {
-  width: 10%;
-  padding: 12px; /* Sesuaikan padding sesuai kebutuhan */
-  border: none;
-  border-radius: 5px;
-  background-color: #342c26;
-  color: white;
-  cursor: pointer;
-}
-
-/* Gaya untuk judul form sign up */
-.sign-up-form {
+/* Gaya untuk judul sign-up */
+.sign-up-form h3 {
   margin-top: 20px;
   margin-bottom: 10px;
-  font-size: 32px; /* Sesuaikan ukuran font sesuai kebutuhan */
+  font-size: 32px; /* Besarkan ukuran font judul sign-up */
 }
 
-/* Gaya untuk label pada form sign up */
-.sign-up-form-label {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 20px;
+/* Gaya untuk label username dan password */
+.sign-in-form label,
+.sign-up-form label {
+  font-size: 14px; /* Perkecil ukuran font label username dan password */
 }
 
-/* Gaya untuk input pada form sign up */
-.sign-up-form-input {
-  width: 100%;
-  padding: 10px; /* Sesuaikan padding sesuai kebutuhan */
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-/* Gaya untuk tombol pada form sign up */
-.sign-up-form input[type="submit"] {
-  width: 10%;
-  padding: 12px; /* Sesuaikan padding sesuai kebutuhan */
+/* Gaya untuk tombol login */
+.login-button,
+.register-button {
+  padding: 12px 24px; /* Sesuaikan padding sesuai kebutuhan */
   border: none;
-  border-radius: 5px;
-  background-color: #342c26;
+  border-radius: 25px; /* Sesuaikan radius sesuai kebutuhan */
+  background-color: #312215; /* Warna coklat untuk tombol */
   color: white;
   cursor: pointer;
+  transition: background-color 0.3s ease; /* Efek transisi ketika tombol dihover */
+  float: right; /* Posisikan tombol di sebelah kanan */
 }
 
-.form-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-#switch-to-register,
-#switch-to-sign-in {
-  margin-left: 10px;
-}
-
-.btn-switch {
-  padding: 6px 12px;
-  font-size: 16px;
-  text-decoration: underline;
-  border: none;
-  background-color: transparent;
-  color: #000000; /* Warna teks */
-  cursor: pointer;
-}
-
-.btn-switch:hover {
-  color: rgb(44, 44, 44);
-  font-size: 1.1em;
-
+.login-button:hover,
+.register-button:hover {
+  background-color: #45332b; /* Warna coklat yang berbeda saat tombol dihover */
 }
 
 .container-about {
   display: flex;
   justify-content: space-around;
   padding: 20px;
+}
+
+.member-profile {
+  text-align: center;
+}
+
+.member-profile img {
+  width: 150px;
+  height: auto;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+/* Comment Input */
+.comment-input {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.comment-input textarea {
+  flex: 1;
+  margin-right: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  resize: none;
+  transition: border-color 0.3s ease;
+}
+
+.comment-input button {
+  background-color: #313227;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.comment-input button:hover {
+  background-color: #50513b;
+}
+
+/* Comment */
+.comment {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  position: relative;
+}
+
+.comment p {
+  margin: 5px 0;
+}
+
+.comment form {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.comment form textarea {
+  width: calc(100% - 50px); /* Lebar text area diatur agar ikon dapat muat di sampingnya */
+  padding: 5px;
+  margin-bottom: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  resize: none;
+  max-height: 100px; /* Maksimum tinggi text area */
+}
+
+.comment form .button-container {
+  position: absolute;
+  top: 0; /* Atur jarak dari atas */
+  right: 0; /* Atur jarak dari kanan */
+  display: flex;
+  flex-direction: column;
+}
+
+.comment form .button-container button {
+  border-radius: 5px;
+  padding: 8px;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+.comment form .button-container button.update {
+  background-color: #313227;
+  color: #fff;
+  border: none;
+}
+
+.comment form .button-container button.update:hover {
+  background-color: #50513b;
+}
+
+.comment form .button-container button.delete {
+  background-color: #FF6347;
+  color: #fff;
+  border: none;
+}
+
+.comment form .button-container button.delete:hover {
+  background-color: #C0392B;
+}
+
+/* Edit and Delete Icons */
+.comment form .button-container .edit-icon {
+  position: absolute;
+  top: 0; /* Atur jarak dari atas */
+  right: 0; /* Atur jarak dari kanan */
+  margin-top: 5px; /* Menambahkan margin atas pada ikon edit */
+}
+
+.comment form .button-container .delete-icon {
+  position: absolute;
+  bottom: 100px; /* Atur jarak dari bawah */
+  right: 0; /* Atur jarak dari kanan */
 }
 
 .member-profile {

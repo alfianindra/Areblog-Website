@@ -95,13 +95,10 @@ router.get('', async (req, res) => {
 
 
 
-
 //Method Get Post:id
 router.get('/post/:id', async (req, res) => {
   try {
-    const locals = {
-      title: 'Post',
-    };
+
     let slug = req.params.id;
 
     // Fetch the post data
@@ -109,6 +106,10 @@ router.get('/post/:id', async (req, res) => {
 
     // Fetch comments associated with the post and populate createdBy field to get username
     const comments = await Comment.find({ postId: slug }).populate('createdBy', 'username');
+
+    const locals = {
+      title: postData.title,
+    }
 
     res.render('post', { 
       locals,
@@ -157,7 +158,10 @@ router.post('/search', async (req, res) => {
 });
 
 
-// Method Get Pada tab About
+/**
+ * GET /
+ * About
+*/
 router.get('/about', (req, res) => {
   const locals = {
     title: 'About',
