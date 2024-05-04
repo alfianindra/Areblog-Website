@@ -12,13 +12,18 @@
       <li>
         <a href="/about">About</a>
       </li>
-    <% if (user) { %>
+      <% if (user) { %>
         <li>
           <a href="/profile"><%= user.username %></a>
         </li>
         <li>
           <a href="/logout">Logout</a>
         </li>
+        <% if (user.role === 'admin') { %>
+          <li>
+            <a href="/dashboard">Dashboard</a>
+          </li>
+        <% } %>
       <% } else { %>
         <li>
           <a href="/admin">Login</a>
