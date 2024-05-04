@@ -1,8 +1,32 @@
 const express = require('express');
 const router = express.Router();
 const Post = require('../models/Post');
-const User = require('../models/User')
-const { Aggregate } = require('mongoose');
+const User = require('../models/User');
+const Comment = require('../models/Comment')
+
+
+const LoginLayout = '../views/layouts/login';
+const mainLayout = '../views/layouts/main';
+
+const authComment = async (req, res, next) => {
+  try {
+    const { user } = req.session;
+    if (!user) {
+      return res.redirect('/admin');
+    }
+
+    const userData = await User.findById(user);
+    if (!userData) {
+      return res.status(401).json({ message: 'User data not found' });
+    }
+
+    req.user = userData; // Attach user object to request for future use
+    next();
+  } catch (error) {
+    console.error('Error in authentication middleware:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
 
 /**
  * GET /
@@ -10,11 +34,6 @@ const { Aggregate } = require('mongoose');
 */
 router.get('', async (req, res) => {
   try {
-    const locals = {
-      title: "NodeJs Blog",
-      description: "Simple Blog created with NodeJs, Express & MongoDb."
-    }
-
     let perPage = 5;
     let page = req.query.page || 1;
     let sort = req.query.sort || 'latest'; 
@@ -56,23 +75,22 @@ router.get('', async (req, res) => {
     const [{ count }] = await Post.aggregate(countPipeline);
     const hasNextPage = page < Math.ceil(count / perPage);
 
-    res.render('index', {
-      locals,
+    res.render('index', { 
       data,
       current: page,
       nextPage: hasNextPage ? parseInt(page) + 1 : null,
       previousPage: page > 1 ? parseInt(page) - 1 : null,
       currentRoute: '/',
       selectedSort: sort,
-      selectedCategory: category
+      selectedCategory: category,
+      user: req.session.user,
     });
 
   } catch (error) {
     console.log(error);
   }
+
 });
-
-
 
 // router.get('', async (req, res) => {
 //   const locals = {
@@ -98,25 +116,30 @@ router.get('/post/:id', async (req, res) => {
   try {
     let slug = req.params.id;
 
-    const data = await Post.findById({ _id: slug });
+    // Fetch the post data
+    const postData = await Post.findById({ _id: slug });
+
+    // Fetch comments associated with the post and populate createdBy field to get username
+    const comments = await Comment.find({ postId: slug }).populate('createdBy', 'username');
 
     const locals = {
-      title: data.title,
+      title: postData.title,
       description: "Simple Blog created with NodeJs, Express & MongoDb.",
     }
 
     res.render('post', { 
-      locals,
-      data,
-      currentRoute: `/post/${slug}`
+      user : req.session.user,
+      layout: mainLayout, 
+      postData,
+      comments, // Pass comments data to the view
+      currentRoute: `/post/${slug}`,
+
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Internal Server Error");
+    console.error(error);
+    res.status(500).send('Internal Server Error');
   }
-
 });
-
 
 /**
  * POST /
@@ -141,8 +164,8 @@ router.post('/search', async (req, res) => {
 
     res.render("search", {
       data,
-      locals,
-      currentRoute: '/'
+      currentRoute: '/',
+      layout: LoginLayout
     });
 
   } catch (error) {
@@ -158,68 +181,116 @@ router.post('/search', async (req, res) => {
 */
 router.get('/about', (req, res) => {
   res.render('about', {
-    currentRoute: '/about'
+    currentRoute: '/about',
+    user : req.session.user,
+    layout: mainLayout
   });
 });
 
+/**
+ * GET /comments
+ * Get all comments
+*/
+router.get('/comments/:id', async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const comments = await Comment.find({ postId });
+    res.render('comments', { comments }); // Render view and pass comments data
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    res.status(500).send('Internal server error');
+  }
+});
 
-// function insertPostData () {
-//   Post.insertMany([
-//     {
-//       title: "Building APIs with Node.js",
-//       body: "Learn how to use Node.js to build RESTful APIs using frameworks like Express.js"
-//     },
-//     {
-//       title: "Deployment of Node.js applications",
-//       body: "Understand the different ways to deploy your Node.js applications, including on-premises, cloud, and container environments..."
-//     },
-//     {
-//       title: "Authentication and Authorization in Node.js",
-//       body: "Learn how to add authentication and authorization to your Node.js web applications using Passport.js or other authentication libraries."
-//     },
-//     {
-//       title: "Understand how to work with MongoDB and Mongoose",
-//       body: "Understand how to work with MongoDB and Mongoose, an Object Data Modeling (ODM) library, in Node.js applications."
-//     },
-//     {
-//       title: "build real-time, event-driven applications in Node.js",
-//       body: "Socket.io: Learn how to use Socket.io to build real-time, event-driven applications in Node.js."
-//     },
-//     {
-//       title: "Discover how to use Express.js",
-//       body: "Discover how to use Express.js, a popular Node.js web framework, to build web applications."
-//     },
-//     {
-//       title: "Asynchronous Programming with Node.js",
-//       body: "Asynchronous Programming with Node.js: Explore the asynchronous nature of Node.js and how it allows for non-blocking I/O operations."
-//     },
-//     {
-//       title: "Learn the basics of Node.js and its architecture",
-//       body: "Learn the basics of Node.js and its architecture, how it works, and why it is popular among developers."
-//     },
-//     {
-//       title: "NodeJs Limiting Network Traffic",
-//       body: "Learn how to limit netowrk traffic."
-//     },
-//     {
-//       title: "Learn Morgan - HTTP Request logger for NodeJs",
-//       body: "Learn Morgan."
-//     },
-//   ])
-// }
 
-// insertPostData();
+/**
+ * POST /comments
+ * Create a new comment
+ * Requires authentication
+*/
+router.post('/add-comments', authComment, async (req, res) => {
+  try {
+    const { postId, text } = req.body;
 
-// function insertUserData () {
-//   User.insertMany([
-//     {
-//       username: "j",
-//       password: "j"
-//     },
-//   ])
-// }
+    // Pastikan postId, text, dan command tidak kosong atau undefined
+    
+    if (!postId ) {
+      return res.status(400).json({ message: 'postId, text, and command are required' });
+    }
+    if (!text ) {
+      return res.status(400).json({ message: ' text, are required' });
+    } 
+    
+    const createdBy = req.user._id; // Mengambil ID pengguna dari objek User
 
-// insertUserData();
+    const newComment = new Comment({
+      postId,
+      text,
+      createdBy,
+    });
+
+    await newComment.save();
+    res.redirect('back');
+  } catch (error) {
+    console.error('Error creating comment:', error);
+    res.status(400).json({ message: 'Bad request', error: error.message });
+  }
+});
+
+// PUT route for updating a comment by ID
+router.put('/update-comments/:id', authComment, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { text } = req.body;
+
+    const comment = await Comment.findById(id);
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    // Check if the logged-in user is the creator of the comment
+    if (comment.createdBy._id.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Unauthorized to edit this comment' });
+    }
+
+    comment.text = text;
+    comment.updatedAt = new Date();
+    await comment.save();
+
+    res.redirect('back');
+  } catch (error) {
+    console.error('Error updating comment:', error);
+    res.status(400).json({ message: 'Bad request' });
+  }
+});
+
+
+
+// DELETE route for deleting comment
+router.delete('/delete-comments/:id', authComment, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+
+    const comment = await Comment.findById(id);
+    // if (!comment) {
+    //   return res.status(404).json({ message: 'Comment not found' });
+    // }
+
+    // Check if the logged-in user is the creator of the comment
+    if (comment.createdBy._id.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Unauthorized to delete this comment' });
+    }
+
+    await Comment.deleteOne({ _id: id }); // Use Comment.deleteOne() to delete the comment
+
+    res.redirect('back')
+  } catch (error) {
+    console.error('Error deleting comment:', error);
+    res.status(400).json({ message: 'Bad request' });
+  }
+});
+
 
 
 

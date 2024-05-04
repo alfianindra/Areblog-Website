@@ -1,80 +1,19 @@
-<div class="form-header">
-  <h3 id="sign-in-heading" class="sign-in-form">Sign In</h3>
-  <h3 id="register-heading" class="sign-up-form" style="display: none;">Sign Up</h3>
-  <div>
-    <button id="switch-to-register" class="btn-switch">Sign Up</button>
-    <button id="switch-to-sign-in" class="btn-switch" style="display: none;">Sign In</button>
+<h3>Sign In</h3>
+<% if (messages.error) { %>
+  <div class="alert alert-danger" role="alert">
+      <%= messages.error %>
   </div>
-</div>
+<% } %>
+<form action="/admin" method="POST" class="sign-in-form">
 
-<form id="sign-in-form" action="/admin" method="POST" class="sign-in-form">
-  <label for="username" class="sign-in-form-label"><b>Username</b></label>
-  <input type="text" placeholder="Enter Username" name="username" class="sign-in-form-input">
+  <label for="username"><b>Username</b></label>
+  <input type="text" placeholder="Enter Username" name="username">
 
-  <label for="password" class="sign-in-form-label"><b>Password</b></label>
-  <input type="password" placeholder="Enter Password" name="password" class="sign-in-form-input">
+  <label for="password"><b>Password</b></label>
+  <input type="password" placeholder="Enter Password" name="password">
 
-  <input type="submit" value="Login" class="btn">
+  <input type="submit" value="Login" class="login-button">
+  <p>don't have account? <a href="/register">Here</a></p>
+
 </form>
 
-<form id="register-form" action="/register" method="POST" class="sign-up-form" style="display: none;">
-  <label for="username" class="sign-up-form-label"><b>Username</b></label>
-  <input type="text" placeholder="Enter Username" name="username" class="sign-up-form-input">
-
-  <label for="password" class="sign-up-form-label"><b>Password</b></label>
-  <input type="password" id="password" placeholder="Enter Password" name="password" class="sign-up-form-input">
-
-  <label for="confirm-password" class="sign-up-form-label"><b>Confirm Password</b></label>
-  <input type="password" id="confirm-password" placeholder="Re-enter Password" name="confirm-password" class="sign-up-form-input">
-
-  <input type="submit" value="Register" class="btn">
-</form>
-
-<!-- Bagian JavaScript -->
-<script>
-  // Mendapatkan elemen-elemen yang dibutuhkan
-  const signInHeading = document.getElementById('sign-in-heading');
-  const signInForm = document.getElementById('sign-in-form');
-  const registerHeading = document.getElementById('register-heading');
-  const registerForm = document.getElementById('register-form');
-  const switchToRegisterButton = document.getElementById('switch-to-register');
-  const switchToSignInButton = document.getElementById('switch-to-sign-in');
-
-  // Fungsi untuk menampilkan formulir sign in dan menyembunyikan sign up
-  function showSignInForm() {
-    signInHeading.style.display = 'block';
-    signInForm.style.display = 'block';
-    registerHeading.style.display = 'none';
-    registerForm.style.display = 'none';
-    switchToSignInButton.style.display = 'none';
-    switchToRegisterButton.style.display = 'block';
-  }
-
-  // Fungsi untuk menampilkan formulir sign up dan menyembunyikan sign in
-  function showRegisterForm() {
-    signInHeading.style.display = 'none';
-    signInForm.style.display = 'none';
-    registerHeading.style.display = 'block';
-    registerForm.style.display = 'block';
-    switchToSignInButton.style.display = 'block';
-    switchToRegisterButton.style.display = 'none';
-  }
-
-  // Validasi password pada formulir pendaftaran
-  registerForm.addEventListener('submit', function(event) {
-    const passwordInput = document.getElementById('password');
-    const confirmPasswordInput = document.getElementById('confirm-password');
-
-    if (passwordInput.value !== confirmPasswordInput.value) {
-      alert("Passwords do not match! Please re-enter your password.");
-      event.preventDefault(); // Mencegah pengiriman formulir
-    }
-  });
-
-  // Mengatur event listener untuk tombol beralih
-  switchToRegisterButton.addEventListener('click', showRegisterForm);
-  switchToSignInButton.addEventListener('click', showSignInForm);
-
-  // Tampilkan formulir sign in secara default
-  showSignInForm();
-</script>
