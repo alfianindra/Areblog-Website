@@ -1,0 +1,56 @@
+<% if (messages.error) { %>
+  <div class="alert alert-danger" role="alert">
+      <%= messages.error %>
+  </div>
+<% } %>
+<div class="profile">
+  <h1 class="profile__heading" id="usernameHeading">
+    <% if (user && user.username) { %>
+      Welcome <%= user.username %>
+    <% } else { %>
+      Tidak ada pengguna yang terautentikasi
+    <% } %>
+  </h1>
+  <% if (user && user.role !== 'admin') { %> <!-- Periksa apakah pengguna adalah admin -->
+    <form id="updateUsernameForm">
+      <label for="newUsername">New Username:</label>
+      <input type="text" id="newUsername" name="newUsername" required>
+      <button type="submit">Update</button>
+    </form>
+  <% } %>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const updateUsernameForm = document.getElementById('updateUsernameForm');
+  if (updateUsernameForm) { // Periksa apakah form ada (untuk pengguna non-admin)
+    updateUsernameForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      const newUsername = document.getElementById('newUsername').value;
+
+      try {
+        const response = await fetch('/update-username', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ newUsername })
+        });
+
+        if (response.ok) {
+          // Perbarui teks heading dengan nama pengguna yang baru
+          const usernameHeading = document.getElementById('usernameHeading');
+          usernameHeading.textContent = `Welcome ${newUsername}`;
+          // Setelah pembaruan berhasil, arahkan kembali ke halaman yang sama
+          window.location.href = window.location.href;
+        } else {
+          console.error('Failed to update username:', response.status);
+        }
+      } catch (error) {
+        console.error('Failed to update username:', error);
+      }
+    });
+  }
+});
+</script>
