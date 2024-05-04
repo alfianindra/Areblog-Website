@@ -28,10 +28,7 @@ const authComment = async (req, res, next) => {
   }
 }
 
-/**
- * GET /
- * HOME
-*/
+// Get Menu Home
 router.get('', async (req, res) => {
   const locals = {
     title: 'Areblog',
@@ -99,10 +96,7 @@ router.get('', async (req, res) => {
 
 
 
-/**
- * GET /
- * Post :id
-*/
+//Method Get Post:id
 router.get('/post/:id', async (req, res) => {
   try {
     const locals = {
@@ -131,10 +125,7 @@ router.get('/post/:id', async (req, res) => {
   }
 });
 
-/**
- * POST /
- * Post - searchTerm
-*/
+// Post Untuk Fitur Search
 router.post('/search', async (req, res) => {
   try {
     const locals = {
@@ -165,10 +156,7 @@ router.post('/search', async (req, res) => {
 });
 
 
-/**
- * GET /
- * About
-*/
+// Method Get Pada tab About
 router.get('/about', (req, res) => {
   const locals = {
     title: 'About',
@@ -181,10 +169,7 @@ router.get('/about', (req, res) => {
   });
 });
 
-/**
- * GET /comments
- * Get all comments
-*/
+// Method Get Pada tab Komen
 router.get('/comments/:id', async (req, res) => {
   try {
     const postId = req.params.id;
@@ -197,11 +182,7 @@ router.get('/comments/:id', async (req, res) => {
 });
 
 
-/**
- * POST /comments
- * Create a new comment
- * Requires authentication
-*/
+// Method Post Pada add-comment
 router.post('/add-comments', authComment, async (req, res) => {
   try {
     const { postId, text } = req.body;
@@ -232,7 +213,7 @@ router.post('/add-comments', authComment, async (req, res) => {
   }
 });
 
-// PUT route for updating a comment by ID
+// Method Put untuk update comment 
 router.put('/update-comments/:id', authComment, async (req, res) => {
   try {
     const { id } = req.params;
@@ -261,7 +242,7 @@ router.put('/update-comments/:id', authComment, async (req, res) => {
 
 
 
-// DELETE route for deleting comment
+// Method delete untuk comment
 router.delete('/delete-comments/:id', authComment, async (req, res) => {
   try {
     const { id } = req.params;
@@ -283,7 +264,7 @@ router.delete('/delete-comments/:id', authComment, async (req, res) => {
   }
 });
 
-
+//Method Get untuk page error
 router.get('/error', (req, res) => {
   const locals = {
     title: 'Internal server error',
