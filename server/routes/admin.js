@@ -14,10 +14,7 @@ const adminLayout = '../views/layouts/admin';
 const jwtSecret = process.env.JWT_SECRET;
 
 
-/**
- * 
- * Check Login
-*/
+// JWT cek login
 const authMiddleware = (req, res, next ) => {
   const token = req.cookies.token;
 
@@ -34,10 +31,7 @@ const authMiddleware = (req, res, next ) => {
   }
 }
 
-/**
- * GET /
- * Admin - Login Page
-*/
+//Get dari Menu Login
 router.get('/admin', async (req, res) => {
   try {
     const locals = {
@@ -50,14 +44,7 @@ router.get('/admin', async (req, res) => {
 });
 
 
-/**
- * POST /
- * Admin - Check Login
-*/
-/**
- * POST /
- * Admin - Check Login
-*/
+//mengecek login
 router.post('/admin', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -95,10 +82,7 @@ router.post('/admin', async (req, res) => {
   }
 });
 
-/**
- * GET /
- * Admin Dashboard
-*/
+//Get Menu dashboard
 router.get('/dashboard', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
@@ -122,15 +106,13 @@ router.get('/dashboard', authMiddleware, async (req, res) => {
 
   } catch (error) {
     console.log(error);
+    res.redirect('/error');
   }
 
 });
 
 
-/**
- * GET /
- * Admin - Create New Post
-*/
+//GET post yang dibuat
 router.get('/add-post', authMiddleware, async (req, res) => {
   try {
     const locals = {
@@ -188,10 +170,7 @@ router.post('/add-post', authMiddleware , upload, async (req, res) => {
 });
 
 
-/**
- * GET /
- * Admin - Create New Post
-*/
+// Get dari Post
 router.get('/edit-post/:id', authMiddleware, async (req, res) => {
   try {
     const locals = {
@@ -214,10 +193,7 @@ router.get('/edit-post/:id', authMiddleware, async (req, res) => {
 });
 
 
-/**
- * PUT /
- * Admin - Create New Post
-*/
+// put untuk Post
 router.put('/edit-post/:id', authMiddleware,upload, async (req, res) => {
   try {
     let id = req.params.id;
@@ -251,10 +227,11 @@ router.put('/edit-post/:id', authMiddleware,upload, async (req, res) => {
 
   } catch (error) {
     console.log(error);
-    res.json({ message: error.message, type: 'danger' });
+    res.redirect('/error');
   }
 });
 
+// get untuk register
 router.get('/register', (req,res) => {
   const locals = {
     title: 'Register',
@@ -266,10 +243,7 @@ router.get('/register', (req,res) => {
   })
 })
 
-/**
- * POST /
- * Admin - Register
-*/
+// Post Register
 router.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -294,10 +268,7 @@ router.post('/register', async (req, res) => {
 });
 
 
-/**
- * DELETE /
- * Admin - Delete Post
-*/
+// Delete Post
 router.delete('/delete-post/:id', authMiddleware, async (req, res) => {
 
   try {
@@ -310,17 +281,74 @@ router.delete('/delete-post/:id', authMiddleware, async (req, res) => {
 });
 
 
-/**
- * GET /
- * Admin Logout
-*/
+// Get Logout 
 router.get('/logout', (req, res) => {
-  req.session.destroy(); // Clear the session data
-  res.clearCookie('token'); // Clear the token cookie
-  res.redirect('/');
-});
-
-
+  router.get('/logout', (req, res) => {
+    res.clearCookie('token');
+    req.session.destroy(err => {
+      if (err) {
+        console.error('Error destroying session:', err);
+        return res.status(500).json({ message: 'Internal server error' });
+      }
+      // Redirect ke halaman login atau halaman sebelumnya (jika ada)
+      res.redirect('/');
+    });
+  });
+  
+  // Route untuk halaman profile
+  router.get('/profile', authMiddleware, async (req, res) => {
+    try {
+      const user = await User.findById(req.userId);
+      res.render('profile', { 
+        user,
+        currentRoute: '/profile', // tambahkan currentRoute ke dalam objek yang akan dirrender
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+  
+  // Post untuk ganti username
+  router.post('/update-username', authMiddleware, async (req, res) => {
+    try {
+      const { newUsername } = req.body;
+      const user = await User.findById(req.userId);
+      
+      // Periksa apakah pengguna ditemukan
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      if (user.role === 'admin') {
+        console.log('Admin tidak dapat mengedit username.'); // sebagai tanda bahwa admin tidak bisa ganti username
+        return res.status(403).json({ message: 'Admin tidak dapat mengedit username.' });
+      }
+      // Jika newUsername adalah 'admin', kembalikan respons dengan pesan yang sesuai
+      if (newUsername.toLowerCase() === 'admin') {
+        console.log('Username tidak boleh "admin".'); // console log pesan bahwa username tidak boleh 'admin'
+        return res.status(403).json({ message: 'Username tidak boleh "admin".' });
+      }
+      
+      const existingUser = await User.findOne({ username: newUsername });
+      if (existingUser) {
+        console.log('Username sudah digunakan, silakan pilih username lain.'); // console log pesan bahwa username sudah digunakan
+        return res.status(409).json({ message: 'Username sudah digunakan, silakan pilih username lain.' });
+      }
+      // Perbarui username pengguna
+      user.username = newUsername;
+      await user.save();
+  
+      console.log('Username updated successfully:', newUsername); 
+  
+      // Kirim respons dengan data pengguna yang diperbarui
+      req.session.user.username = newUsername;
+      res.redirect('/profile');
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
 
 
 module.exports = router;

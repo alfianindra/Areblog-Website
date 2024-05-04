@@ -144,9 +144,10 @@ router.post('/search', async (req, res) => {
 
     res.render("search", {
       locals,
+      user,
       data,
       currentRoute: '/',
-      layout: LoginLayout
+      layout: mainLayout
     });
 
   } catch (error) {
