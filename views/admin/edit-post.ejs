@@ -8,14 +8,33 @@
 
 </div>
 
-<form action="/edit-post/<%= data._id %>?_method=PUT" method="POST">
+<form action="/edit-post/<%= data._id %>?_method=PUT" method="POST" enctype="multipart/form-data">
 
   <label for="title"><b>Title</b></label>
   <input type="text" placeholder="Post Title" name="title" value="<%= data.title %>">
 
+  <label for="image">Select Image</label>
+  <input type="file" name="image" placeholder="Enter name">
+  <img src="/<%= data.image %>" class="img-thumbnail" alt="">
+
+  <label for="category"><b>Category</b></label>
+  <select name="category">
+    <option value="technology">Technology</option>
+    <option value="science">Science</option>
+    <option value="health">Health</option>
+    <option value="politics">Politics</option>
+    <option value="sports">Sports</option>
+    <option value="entertainment">Entertainment</option>
+    <option value="environment">Environment</option>
+    <option value="education">Education</option>
+    <option value="lifestyle">Lifestyle</option>
+    <option value="religion">Religion</option>
+    <option value="economic">Economics</option>
+    <!-- Add more options as needed -->
+  </select>
+  
   <label for="body"><b>Content</b></label>
-  <textarea name="body" cols="50" rows="10"><%= data.body %></textarea>
-
-  <input type="submit" value="Update" class="btn">
-
-</form>
+  
+    <textarea name="body" cols="50" rows="10"><%= data.body %></textarea>
+    <input type="submit" value="Update" class="btn">
+  </form>

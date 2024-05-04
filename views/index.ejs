@@ -1,16 +1,39 @@
-<div class="author">
-  <h1 class="author__heading">Areblog</h1>
-  <p class="author__body">Build Your Own Blog Here.</p>
-</div>
+<h2 class="author__heading">News Update</h2>
 
+<img src="/img/image.jpeg" alt="news" class="hero-image" width="981" height="528">
 
 <section class="articles">
-  <h2 class="articles__heading">Latest Posts</h2>
+  <div class="header">
+    <h2 class="articles__heading">Posts</h2>
+    <div class="filter-sort">
+      <select id="sort-options" class="sort-options">
+        <option value="latest">Latest</option>
+        <option value="oldest">Oldest</option>
+        <option value="a-to-z">A to Z</option>
+        <option value="z-to-a">Z to A</option>
+      </select>
+      <select id="filter-category" class="filter-category">
+        <option value="all">All Categories</option>
+        <option value="technology">Technology</option>
+        <option value="science">Science</option>
+        <option value="health">Health</option>
+        <option value="politics">Politics</option>
+        <option value="sports">Sports</option>
+        <option value="entertainment">Entertainment</option>
+        <option value="environment">Environment</option>
+        <option value="education">Education</option>
+        <option value="lifestyle">Lifestyle</option>
+        <option value="religion">Religion</option>
+        <option value="economic">Economics</option>
+      </select>
+    </div>
+  </div>
 
   <ul class="article-ul">
     <% data.forEach(post => { %>
-      <li>
+      <li data-category="<%= post.category %>">
         <a href="/post/<%= post._id %>">
+          <span><img class="post-image" src="./uploads/<%= post.image %>" alt=""></span>
           <span><%= post.title %></span>
           <span class="article-list__date"><%= post.createdAt.toDateString() %></span>
         </a>
@@ -18,14 +41,102 @@
     <% }) %>
   </ul>
 
-
-  <% if (nextPage !== null) { %>
-    <a href="/?page=<%= nextPage %>" class="pagination">&lt; View Older Posts</a>
+<div class="pagination">
+  <% if (nextPage) { %>
+    <a href="/?page=<%= nextPage %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>" class="pagination-btn next">Next Page -></a>
   <% } %>
- 
+  <% if (previousPage) { %>
+    <a href="/?page=<%= previousPage %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>" class="pagination-btn prev"><- Previous Page</a>
+  <% } %>
+</div>
 
   
-
-
-
+  
 </section>
+
+<script>
+  const sortOptions = document.getElementById('sort-options');
+  const filterCategoryOptions = document.getElementById('filter-category');
+  const articles = Array.from(document.querySelectorAll('.article-ul > li'));
+  
+  function selectCategory() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedCategory = urlParams.get('category') || 'all';
+    filterCategoryOptions.value = selectedCategory;
+    articles.forEach(article => {
+      const articleCategory = article.getAttribute('data-category');
+      if (selectedCategory === 'all' || articleCategory === selectedCategory) {
+        article.style.display = 'block';
+      } else {
+        article.style.display = 'none';
+      }
+    });
+  }
+  
+  function sortLatest() {
+    articles.sort((a, b) => {
+      const dateA = new Date(a.querySelector('.article-list__date').textContent);
+      const dateB = new Date(b.querySelector('.article-list__date').textContent);
+      return dateB - dateA;
+    });
+    const articleList = document.querySelector('.article-ul');
+    articleList.innerHTML = '';
+    articles.forEach(article => articleList.appendChild(article));
+  }
+  
+  function sortOldest() {
+    articles.sort((a, b) => {
+      const dateA = new Date(a.querySelector('.article-list__date').textContent);
+      const dateB = new Date(b.querySelector('.article-list__date').textContent);
+      return dateA - dateB;
+    });
+    const articleList = document.querySelector('.article-ul');
+    articleList.innerHTML = '';
+    articles.forEach(article => articleList.appendChild(article));
+  }
+  
+  function sortAToZ() {
+    articles.sort((a, b) => {
+      const titleA = a.querySelector('span:nth-child(2)').textContent.toLowerCase();
+      const titleB = b.querySelector('span:nth-child(2)').textContent.toLowerCase();
+      return titleA.localeCompare(titleB);
+    });
+    const articleList = document.querySelector('.article-ul');
+    articleList.innerHTML = '';
+    articles.forEach(article => articleList.appendChild(article));
+  }
+  
+  function sortZToA() {
+    articles.sort((a, b) => {
+      const titleA = a.querySelector('span:nth-child(2)').textContent.toLowerCase();
+      const titleB = b.querySelector('span:nth-child(2)').textContent.toLowerCase();
+      return titleB.localeCompare(titleA);
+    });
+    const articleList = document.querySelector('.article-ul');
+    articleList.innerHTML = '';
+    articles.forEach(article => articleList.appendChild(article));
+  }
+  
+  filterCategoryOptions.addEventListener('change', () => {
+    const selectedCategory = filterCategoryOptions.value;
+    const currentPage = window.location.href.split('?')[0];
+    window.location.href = `${currentPage}?category=${selectedCategory}`;
+  });
+  
+  // Tangani perubahan pilihan sort
+  sortOptions.addEventListener('change', () => {
+    const selectedSort = sortOptions.value;
+    const selectedCategory = filterCategoryOptions.value;
+    const currentPage = window.location.href.split('?')[0]; // Ambil URL tanpa parameter
+    window.location.href = `${currentPage}?category=${selectedCategory}&sort=${selectedSort}`; // Kirim permintaan ke server dengan parameter sort yang dipilih
+  });
+  
+  window.addEventListener('load', () => {
+    selectCategory();
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedSort = urlParams.get('sort') || 'latest';
+    sortOptions.value = selectedSort;
+  });
+  
+  </script>
+  

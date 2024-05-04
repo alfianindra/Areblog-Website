@@ -1,29 +1,27 @@
 <header class="header">
-  <a href="/" class="header__logo">Areblog</a>
+  <a href="/" class="header__logo">
+    <span class="logo-icon">📰</span>
+    AreBlog
+  </a>
 
   <nav class="header__nav">
     <ul>
       <li>
-        <a href="/">Home</a>
+        <a href="/" id="homeLink">Home</a>
       </li>
       <li>
-        <a href="/about">About</a>
+        <a href="/about" id="aboutLink">About</a>
       </li>
       <% if (user) { %>
         <li>
-          <a href="/profile"><%= user.username %></a>
+          <a href="/profile" id="profileLink"><%= user.username %></a>
         </li>
         <li>
           <a href="/logout">Logout</a>
         </li>
-        <% if (user.role === 'admin') { %>
-          <li>
-            <a href="/dashboard">Dashboard</a>
-          </li>
-        <% } %>
       <% } else { %>
         <li>
-          <a href="/admin">Login</a>
+          <a href="/admin" id="adminLink">Login</a>
         </li>
       <% } %>
     </ul>
@@ -38,4 +36,25 @@
       </svg>
     </button>
   </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+  var path = window.location.pathname;
+  var homeLink = document.getElementById("homeLink");
+  var aboutLink = document.getElementById("aboutLink");
+  var profileLink = document.getElementById("profileLink");
+  var adminLink = document.getElementById("adminLink");
+
+  if (path === "/") {
+    homeLink.classList.add("active");
+  } else if (path === "/about") {
+    aboutLink.classList.add("active");
+  } else if (path === "/profile") {
+    profileLink.classList.add("active");
+  } else if (path === "/admin") {
+    adminLink.classList.add("active");
+  }
+});
+</script>
+
 </header>

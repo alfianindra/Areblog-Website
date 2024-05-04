@@ -1,2 +1,50 @@
-<h1><%= data.title %></h1>
-<article class="article"><%= data.body %></article>
+<a href="/">&larr; Back</a>
+
+<center>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <h1><%= postData.title %></h1>
+  <% if (postData.image) { %>
+    <img src='/uploads/<%=postData.image%>' class="img-thumbnail" alt="">
+  <% } else { %>
+    <p>No image available</p>
+  <% } %>
+  
+  <article class="article"><%= postData.body %></article> 
+
+<!-- Existing Comments -->
+<% comments.forEach(comment => { %>
+  <div class="comment">
+    <div class="comment-content">
+      <p><strong><%= comment.createdBy.username %></strong> - <%= comment.createdAt.toLocaleString() %></p>
+      <p><%= comment.text %></p>
+    </div>
+    <% if (user && user._id && comment.createdBy.id === user._id) { %>
+      <div class="comment-actions">
+        <form action="/update-comments/<%= comment._id %>?_method=PUT" method="POST">
+          <input type="hidden" name="update" value="PUT">
+          <textarea name="text"><%= comment.text %></textarea>
+          <div class="button-container">
+            <button type="submit" class="update"><i class="fas fa-edit"></i></button>
+          </div>
+        </form>
+        <form action="/delete-comments/<%= comment._id %>?_method=DELETE" method="POST">
+          <input type="hidden" name="Delete" value="DELETE">
+          <div class="button-container">
+            <button type="submit" class="delete"><i class="fas fa-times"></i></button>
+          </div>
+        </form>
+      </div>
+    <% } %>
+  </div>
+<% }) %>
+
+
+  <!-- New Comment Form -->
+  <form action="/add-comments" method="POST">
+    <input type="hidden" name="postId" value="<%= postData._id %>">
+    <div class="comment-input">
+      <textarea name="text" placeholder="Write your comment"></textarea>
+      <button type="submit" class="post">Post</button>
+    </div>
+  </form>
+</center>

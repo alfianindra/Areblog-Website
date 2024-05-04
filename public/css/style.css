@@ -17,6 +17,7 @@ body {
   color: var(--black);
   font-size: var(--font-size-base);
   background-color: #FAF5EE;
+  background-image: url("/img/img-noise-361x370.png");
   margin: 0;
 }
 
@@ -25,6 +26,7 @@ h1 { font-size: var(--font-size-xl); }
 h2 { font-size: var(--font-size-lg); }
 h3 { font-size: var(--font-size-md); }
 
+input[type="file"],
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -40,23 +42,82 @@ textarea {
   margin-bottom: 1rem;
 }
 
-.btn {
-  background-color: var(--black);
-  border: none;
-  color: white; 
-  padding: 16px 32px;
+/* Gaya Post */
+.post {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.post a {
+  color: #333;
   text-decoration: none;
-  margin: 4px 2px; 
+  font-weight: bold;
+  font-size: 18px;
+  margin-left: 18px; /* Menambahkan margin kanan */
+}
+
+.post a:hover {
+  color: #555;
+  text-decoration: underline;
+}
+
+/* Tombol Tambah Baru */
+.btn-add-new {
+  background-color: #000000;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease;
   cursor: pointer;
 }
 
-.btn-delete {
-  padding: 10px 16px;
-  background-color: var(--red);
+.btn-add-new:hover {
+  background-color: #333333;
+}
+
+/* Tombol Edit */
+.btn-edit {
+  background-color: #4f3522 !important; /* Ubah warna latar belakang menjadi coklat */
+  color: white !important; /* Ubah warna teks menjadi putih */
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 15px !important;
+  font-weight: 300 !important;
+}
+
+.btn-edit:hover {
+  background-color: #3d2f29 !important; /* Warna latar belakang saat dihover */
 }
 
 
-img {
+/* Tombol Hapus */
+.btn-delete {
+  background-color: #f44336;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 18px;
+}
+
+.btn-delete:hover {
+  background-color: #d32f2f;
+}
+
+.img-big {
   width: 100%;
   height: auto;
 }
@@ -70,6 +131,7 @@ img {
 
 .main {
   padding: 20px 0;
+  min-height: calc(100vh - 100px);
 }
 
 /* Hero Section */
@@ -88,28 +150,26 @@ img {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto;
   grid-template-areas: 
-  "logo button"
-  "menu menu";
+    "logo button"
+    "menu menu";
   padding-top: 10px;
+  border-bottom: 3px solid #6c552b; /* Perhatikan tanda komentar di sini */
 }
 
 @media only screen and (min-width: 768px) {
   .header {
     grid-template-columns: auto 1fr auto;
     grid-template-areas: 
-    "logo menu button";
+      "logo menu button";
   }
 }
 
 .header__logo {
-  font-weight: 800;
-  font-size: 25px;
+  font-weight: 1000;
+  font-size: 40px;
   text-decoration: none;
   grid-area: logo;
-}
-
-.header__logo:hover {
-  text-decoration: underline;
+  color: #48402e;
 }
 
 .header__nav {
@@ -117,6 +177,7 @@ img {
   display: flex;
   grid-area: menu;
 }
+
 
 .header__logo, .header__nav, .header__button {
   width: 100%;
@@ -160,13 +221,14 @@ img {
   text-decoration: none;
 }
 
-.header__nav ul a.active {
+.header__nav ul li a.active {
   color: #7E7E7E;
 }
 
 .header__nav ul a:hover {
   text-decoration: underline;
 }
+
 
 /* Author - HomePage */
 .author {
@@ -177,6 +239,8 @@ img {
 .author__heading {
   margin-top: 10px;
   margin-bottom: 5px;
+  font-size: 50px;
+  font-family: 'News701 BT', sans-serif;
 }
 
 .author__body {
@@ -185,10 +249,74 @@ img {
 }
 
 
+/* Filter */
+.filter-category {
+  width: 200px;
+  margin-top: 50px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #ffffff;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.filter-category:hover {
+  background-color: #e5e5e5;
+}
+
+/* Sort */
+.sort-options {
+  width: 150px;
+  margin-top: 50px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #ffffff;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.sort-options:hover {
+  background-color: #e5e5e5;
+}
+
+/* Icon */
+.filter-category::after,
+.sort-options::after {
+  content: "\25BC"; /* panah ke bawah */
+  margin-left: 5px;
+}
+
+/* Hover Effect for Icon */
+.filter-category:hover::after,
+.sort-options:hover::after {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
+
+
+
 /* Home Article List */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Untuk menjaga elemen "Posts" berada di sebelah kiri dan filter-sort di sebelah kanan */
+}
+
 .articles__heading {
   margin-top: 4rem;
   font-weight: 400;
+}
+
+.filter-sort {
+  display: flex;
+  align-items: center;
+}
+
+#sort-options,
+#filter-category {
+  margin-left: 10px;
 }
 
 .article-ul {
@@ -249,18 +377,52 @@ img {
   filter: none;
 }
 
-
 .article {
   white-space: pre-wrap;
 }
 
 
-/* Footer */
 .footer {
-  margin: 4rem;
-  text-align: center;
+  background-color: black;
+  color: white;
+  padding: 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
 }
 
+.footer__left {
+  flex: 1;
+  margin-left: 50px;
+  margin-top: 10px;
+}
+
+.footer__center {
+  flex: 2;
+  margin-top: 10px;
+  margin-left: 50px;
+  margin-right: 50px;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.footer__center p {
+  margin: 0; /* Menghilangkan margin bawaan */
+  padding: 0; /* Menghilangkan padding bawaan */
+}
+
+.footer__right {
+  flex: 1;
+  text-align: right;
+  margin-right: 50px;
+}
+
+.footer__logo {
+  width: 350px; /* Sesuaikan dengan lebar yang diinginkan */
+  height: 100px;
+}
 
 /* Dashboard Admin */
 .admin-title {
@@ -323,19 +485,220 @@ img {
   right: 0;
   color: var(--gray-light);
   padding: 15px;
+  cursor: pointer;
 }
 
-
+/* Pagination */
 .pagination {
-  font-size: 1.3rem;
-  color: var(--gray);
-  text-decoration: none;
-  margin-top: 40px;
-  display: inline-block;
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
 }
 
-.pagination:hover {
-  color: var(--black);
+.pagination-btn {
+  padding: 10px 20px;
+  border: none;
+  background-color: transparent;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.pagination-btn:hover {
+  color: #555;
+}
+
+.pagination-btn i {
+  margin-right: 5px;
+}
+
+.pagination-btn.prev {
+  order: -1; /* Menempatkan previous page di bagian kiri */
+  display: flex;
+  justify-content: flex-start;
+}
+
+
+.img-thumbnail {
+  padding: .25rem;
+  background-color: var(--bs-body-bg);
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  max-width: 50%;
+  height: auto;
+}
+
+.post-image {
+  max-width: 200px; 
+  max-height: 200px; 
+}
+
+/* Gaya untuk judul sign-in */
+.sign-in-form h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 32px; /* Besarkan ukuran font judul sign-in */
+}
+
+/* Gaya untuk judul sign-up */
+.sign-up-form h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 32px; /* Besarkan ukuran font judul sign-up */
+}
+
+/* Gaya untuk label username dan password */
+.sign-in-form label,
+.sign-up-form label {
+  font-size: 14px; /* Perkecil ukuran font label username dan password */
+}
+
+/* Gaya untuk tombol login */
+.login-button,
+.register-button {
+  padding: 12px 24px; /* Sesuaikan padding sesuai kebutuhan */
+  border: none;
+  border-radius: 25px; /* Sesuaikan radius sesuai kebutuhan */
+  background-color: #312215; /* Warna coklat untuk tombol */
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Efek transisi ketika tombol dihover */
+  float: right; /* Posisikan tombol di sebelah kanan */
+}
+
+.login-button:hover,
+.register-button:hover {
+  background-color: #45332b; /* Warna coklat yang berbeda saat tombol dihover */
+}
+
+.container-about {
+  display: flex;
+  justify-content: space-around;
+  padding: 20px;
+}
+
+.member-profile {
+  text-align: center;
+}
+
+.member-profile img {
+  width: 150px;
+  height: auto;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+/* Comment Input */
+.comment-input {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.comment-input textarea {
+  flex: 1;
+  margin-right: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  resize: none;
+  transition: border-color 0.3s ease;
+}
+
+.comment-input button {
+  background-color: #313227;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.comment-input button:hover {
+  background-color: #50513b;
+}
+
+/* Comment */
+.comment {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  position: relative;
+}
+
+.comment p {
+  margin: 5px 0;
+}
+
+.comment form {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.comment form textarea {
+  width: calc(100% - 50px); /* Lebar text area diatur agar ikon dapat muat di sampingnya */
+  padding: 5px;
+  margin-bottom: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  resize: none;
+  max-height: 100px; /* Maksimum tinggi text area */
+}
+
+.comment form .button-container {
+  position: absolute;
+  top: 0; /* Atur jarak dari atas */
+  right: 0; /* Atur jarak dari kanan */
+  display: flex;
+  flex-direction: column;
+}
+
+.comment form .button-container button {
+  border-radius: 5px;
+  padding: 8px;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+.comment form .button-container button.update {
+  background-color: #313227;
+  color: #fff;
+  border: none;
+}
+
+.comment form .button-container button.update:hover {
+  background-color: #50513b;
+}
+
+.comment form .button-container button.delete {
+  background-color: #FF6347;
+  color: #fff;
+  border: none;
+}
+
+.comment form .button-container button.delete:hover {
+  background-color: #C0392B;
+}
+
+/* Edit and Delete Icons */
+.comment form .button-container .edit-icon {
+  position: absolute;
+  top: 0; /* Atur jarak dari atas */
+  right: 0; /* Atur jarak dari kanan */
+  margin-top: 5px; /* Menambahkan margin atas pada ikon edit */
+}
+
+.comment form .button-container .delete-icon {
+  position: absolute;
+  bottom: 100px; /* Atur jarak dari bawah */
+  right: 0; /* Atur jarak dari kanan */
 }
 
 .profile {
