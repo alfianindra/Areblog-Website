@@ -17,6 +17,7 @@ body {
   color: var(--black);
   font-size: var(--font-size-base);
   background-color: #FAF5EE;
+  background-image: url("/img/img-noise-361x370.png");
   margin: 0;
 }
 
@@ -25,6 +26,7 @@ h1 { font-size: var(--font-size-xl); }
 h2 { font-size: var(--font-size-lg); }
 h3 { font-size: var(--font-size-md); }
 
+input[type="file"],
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -56,7 +58,7 @@ textarea {
 }
 
 
-img {
+.img-big {
   width: 100%;
   height: auto;
 }
@@ -70,6 +72,7 @@ img {
 
 .main {
   padding: 20px 0;
+  min-height: calc(100vh - 100px);
 }
 
 /* Hero Section */
@@ -88,28 +91,26 @@ img {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto;
   grid-template-areas: 
-  "logo button"
-  "menu menu";
+    "logo button"
+    "menu menu";
   padding-top: 10px;
+  border-bottom: 3px solid #6c552b; /* Perhatikan tanda komentar di sini */
 }
 
 @media only screen and (min-width: 768px) {
   .header {
     grid-template-columns: auto 1fr auto;
     grid-template-areas: 
-    "logo menu button";
+      "logo menu button";
   }
 }
 
 .header__logo {
-  font-weight: 800;
-  font-size: 25px;
+  font-weight: 1000;
+  font-size: 40px;
   text-decoration: none;
   grid-area: logo;
-}
-
-.header__logo:hover {
-  text-decoration: underline;
+  color: #48402e;
 }
 
 .header__nav {
@@ -118,7 +119,13 @@ img {
   grid-area: menu;
 }
 
-.header__logo, .header__nav, .header__button {
+.header_a_nav {
+  display: flex;
+  grid-area: menu;
+  justify-content: right;
+}
+
+.header__logo, .header__nav, .header__button, .header_a_nav {
   width: 100%;
 }
 
@@ -147,7 +154,7 @@ img {
 }
 
 /* Header -> Navigation */
-.header__nav ul {
+.header__nav ul, .header_a_nav ul {
   list-style-type: none;
   display: flex;
   gap: 1rem;
@@ -155,17 +162,23 @@ img {
   padding: 0;
 }
 
-.header__nav ul a {
+.header__nav ul a, .header_a_nav ul a {
   padding: 10px;
   text-decoration: none;
 }
 
-.header__nav ul a.active {
+.header__nav ul li a.active, .header_a_nav ul li a.active {
   color: #7E7E7E;
 }
 
-.header__nav ul a:hover {
+.header__nav ul a:hover, .header_a_nav ul a:hover {
   text-decoration: underline;
+}
+
+.header_a_nav{
+  display: flex;
+  grid-area: menu;
+  justify-content: right;
 }
 
 /* Author - HomePage */
@@ -177,6 +190,8 @@ img {
 .author__heading {
   margin-top: 10px;
   margin-bottom: 5px;
+  font-size: 50px;
+  font-family: 'News701 BT', sans-serif;
 }
 
 .author__body {
@@ -185,10 +200,74 @@ img {
 }
 
 
+/* Filter */
+.filter-category {
+  width: 200px;
+  margin-top: 50px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #ffffff;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.filter-category:hover {
+  background-color: #e5e5e5;
+}
+
+/* Sort */
+.sort-options {
+  width: 150px;
+  margin-top: 50px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #ffffff;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.sort-options:hover {
+  background-color: #e5e5e5;
+}
+
+/* Icon */
+.filter-category::after,
+.sort-options::after {
+  content: "\25BC"; /* panah ke bawah */
+  margin-left: 5px;
+}
+
+/* Hover Effect for Icon */
+.filter-category:hover::after,
+.sort-options:hover::after {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
+
+
+
 /* Home Article List */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Untuk menjaga elemen "Posts" berada di sebelah kiri dan filter-sort di sebelah kanan */
+}
+
 .articles__heading {
   margin-top: 4rem;
   font-weight: 400;
+}
+
+.filter-sort {
+  display: flex;
+  align-items: center;
+}
+
+#sort-options,
+#filter-category {
+  margin-left: 10px;
 }
 
 .article-ul {
@@ -249,18 +328,51 @@ img {
   filter: none;
 }
 
-
 .article {
   white-space: pre-wrap;
 }
 
 
-/* Footer */
 .footer {
-  margin: 4rem;
-  text-align: center;
+  background-color: black;
+  color: white;
+  padding: 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
+.footer__left {
+  flex: 1;
+  margin-left: 50px;
+  margin-top: 10px;
+}
+
+.footer__center {
+  flex: 2;
+  margin-top: 10px;
+  margin-left: 50px;
+  margin-right: 50px;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.footer__center p {
+  margin: 0; /* Menghilangkan margin bawaan */
+  padding: 0; /* Menghilangkan padding bawaan */
+}
+
+.footer__right {
+  flex: 1;
+  text-align: right;
+  margin-right: 50px;
+}
+
+.footer__logo {
+  width: 350px; /* Sesuaikan dengan lebar yang diinginkan */
+  height: 100px;
+}
 
 /* Dashboard Admin */
 .admin-title {
@@ -323,29 +435,211 @@ img {
   right: 0;
   color: var(--gray-light);
   padding: 15px;
+  cursor: pointer;
 }
 
-
+/* Pagination */
 .pagination {
-  font-size: 1.3rem;
-  color: var(--gray);
-  text-decoration: none;
-  margin-top: 40px;
-  display: inline-block;
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
 }
 
-.pagination:hover {
-  color: var(--black);
+.pagination-btn {
+  padding: 10px 20px;
+  border: none;
+  background-color: transparent;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: #333;
+  transition: color 0.3s ease;
 }
 
-.profile {
-  padding: 10px 0;
+.pagination-btn:hover {
+  color: #555;
+}
+
+.pagination-btn i {
+  margin-right: 5px;
+}
+
+.pagination-btn.prev {
+  order: -1; /* Menempatkan previous page di bagian kiri */
+  display: flex;
+  justify-content: flex-start;
+}
+
+
+.img-thumbnail {
+  padding: .25rem;
+  background-color: var(--bs-body-bg);
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  max-width: 50%;
+  height: auto;
+}
+
+.post-image {
+  max-width: 200px; 
+  max-height: 200px; 
+}
+
+/* Gaya untuk judul form */
+.sign-in-form {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 32px; /* Atur ukuran font sesuai kebutuhan */
+}
+
+/* Gaya untuk label */
+.sign-in-form-label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 20px;
+}
+
+/* Gaya untuk input */
+.sign-in-form-input {
+  width: 100%;
+  padding: 10px; /* Sesuaikan padding sesuai kebutuhan */
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Gaya untuk tombol */
+.sign-in-form input[type="submit"] {
+  width: 10%;
+  padding: 12px; /* Sesuaikan padding sesuai kebutuhan */
+  border: none;
+  border-radius: 5px;
+  background-color: #342c26;
+  color: white;
+  cursor: pointer;
+}
+
+/* Gaya untuk judul form sign up */
+.sign-up-form {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 32px; /* Sesuaikan ukuran font sesuai kebutuhan */
+}
+
+/* Gaya untuk label pada form sign up */
+.sign-up-form-label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 20px;
+}
+
+/* Gaya untuk input pada form sign up */
+.sign-up-form-input {
+  width: 100%;
+  padding: 10px; /* Sesuaikan padding sesuai kebutuhan */
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Gaya untuk tombol pada form sign up */
+.sign-up-form input[type="submit"] {
+  width: 10%;
+  padding: 12px; /* Sesuaikan padding sesuai kebutuhan */
+  border: none;
+  border-radius: 5px;
+  background-color: #342c26;
+  color: white;
+  cursor: pointer;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#switch-to-register,
+#switch-to-sign-in {
+  margin-left: 10px;
+}
+
+.btn-switch {
+  padding: 6px 12px;
+  font-size: 16px;
+  text-decoration: underline;
+  border: none;
+  background-color: transparent;
+  color: #000000; /* Warna teks */
+  cursor: pointer;
+}
+
+.btn-switch:hover {
+  color: rgb(44, 44, 44);
+  font-size: 1.1em;
+
+}
+
+.container-about {
+  display: flex;
+  justify-content: space-around;
+  padding: 20px;
+}
+
+.member-profile {
   text-align: center;
 }
 
-.profile__heading {
-  margin-top: 10px;
-  margin-bottom: 5px;
+.member-profile img {
+  width: 150px;
+  height: auto;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+
+.page-wrap {
+  height: 100vh;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.error_container {
+  max-width: 960px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.display-1 {
+  font-size: 6rem;
+  display: block;
+}
+
+.d-block {
+  display: block;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+.lead {
+  font-size: 1.25rem;
+  font-weight: 300;
+}
+
+.error a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.error a:hover {
+  text-decoration: underline;
 }
 
 .alert {

@@ -1,8 +1,7 @@
-<div class="author">
-  <h1 class="author__heading">Areblog</h1>
-  <p class="author__body">Build Your Own Blog Here.</p>
-</div>
+<h1 class="author__heading">Areblog</h1>
 
+
+<img src="/img/image.jpeg" alt="news" class="hero-image" width="981" height="528">
 
 <section class="articles">
   <h2 class="articles__heading">Latest Posts</h2>
@@ -11,6 +10,7 @@
     <% data.forEach(post => { %>
       <li>
         <a href="/post/<%= post._id %>">
+          <span><img class="post-image" src="./uploads/<%= post.image %>" alt=""></span>
           <span><%= post.title %></span>
           <span class="article-list__date"><%= post.createdAt.toDateString() %></span>
         </a>

@@ -8,10 +8,14 @@
 
 </div>
 
-<form action="/edit-post/<%= data._id %>?_method=PUT" method="POST">
+<form action="/edit-post/<%= data._id %>?_method=PUT" method="POST" enctype="multipart/form-data">
 
   <label for="title"><b>Title</b></label>
   <input type="text" placeholder="Post Title" name="title" value="<%= data.title %>">
+
+  <label for="image">Select Image</label>
+  <input type="file" name="image" placeholder="Enter name">
+  <img src="/<%= data.image %>" class="img-thumbnail" alt="">
 
   <label for="body"><b>Content</b></label>
   <textarea name="body" cols="50" rows="10"><%= data.body %></textarea>

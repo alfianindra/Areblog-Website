@@ -3,25 +3,26 @@ const router = express.Router();
 const Post = require('../models/Post');
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
-const flash = require('express-flash');
-const crypto = require('crypto');
-const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const fs = require('fs');
+const { title } = require('process');
 
+
+const mainLayout = '../views/layouts/login';
 const adminLayout = '../views/layouts/admin';
-const mainLayout= '../views/layouts/login';
 const jwtSecret = process.env.JWT_SECRET;
 
-const app = express();
-app.use(flash());
 
-// JWT cek login
+/**
+ * 
+ * Check Login
+*/
 const authMiddleware = (req, res, next ) => {
   const token = req.cookies.token;
-  console.log("Token:", token); // Tambahkan log untuk menampilkan nilai token
 
   if(!token) {
-    return res.status(401).json( { message: 'Unauthorized'} );
+    return res.redirect('/error')
   }
 
   try {
@@ -29,26 +30,34 @@ const authMiddleware = (req, res, next ) => {
     req.userId = decoded.userId;
     next();
   } catch(error) {
-    console.log("Error decoding token:", error); // Tambahkan log untuk menampilkan pesan error saat token tidak valid
-    res.status(401).json( { message: 'Unauthorized'} );
+    return res.redirect('/error')
   }
 }
 
-
-//Get dari Menu Login
+/**
+ * GET /
+ * Admin - Login Page
+*/
 router.get('/admin', async (req, res) => {
   try {
-    const user = req.session.user; // Define the user variable by accessing it from the session
-
-    res.render('admin/index', { user, layout: mainLayout });
+    const locals = {
+      title: 'Login',
+    };
+    res.render('admin/index', {layout: mainLayout , locals});
   } catch (error) {
     console.log(error);
   }
 });
 
 
-
-//mengecek login
+/**
+ * POST /
+ * Admin - Check Login
+*/
+/**
+ * POST /
+ * Admin - Check Login
+*/
 router.post('/admin', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -86,38 +95,52 @@ router.post('/admin', async (req, res) => {
   }
 });
 
-
-
-//Get Menu dashboard
+/**
+ * GET /
+ * Admin Dashboard
+*/
 router.get('/dashboard', authMiddleware, async (req, res) => {
- try {
+  try {
     const user = await User.findById(req.userId);
 
     // Memeriksa peran pengguna
     if (!user || user.role !== 'admin') {
-      return res.status(403).json({ message: 'Forbidden' });
+      return res.redirect('/error')
     }
+
+    const locals = {
+      title: 'Dashboard',
+    };
 
     const data = await Post.find();
     res.render('admin/dashboard', {
+      user : req.session.user,
+      locals,
       data,
       layout: adminLayout
     });
 
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Internal server error' });
   }
+
 });
 
 
-
-//GET post yang dibuat
+/**
+ * GET /
+ * Admin - Create New Post
+*/
 router.get('/add-post', authMiddleware, async (req, res) => {
   try {
+    const locals = {
+      title: 'Add Post',
+    };
 
     const data = await Post.find();
     res.render('admin/add-post', {
+      locals,
+      user: req.session.user,
       layout: adminLayout
     });
 
@@ -127,36 +150,59 @@ router.get('/add-post', authMiddleware, async (req, res) => {
 
 });
 
+// Image upload configuration
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+      cb(null, './public/uploads');
+  },
+  filename: function(req, file, cb) {
+      cb(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
+  },
+});
 
-// POST create Post
-router.post('/add-post', authMiddleware, async (req, res) => {
+const upload = multer({ storage: storage }).single("image");
+
+/**
+ * POST /
+ * Admin - Create New Post
+*/
+router.post('/add-post', authMiddleware , upload, async (req, res) => {
   try {
-    try {
-      const newPost = new Post({
-        title: req.body.title,
-        body: req.body.body
-      });
-
-      await Post.create(newPost);
-      res.redirect('/dashboard');
-    } catch (error) {
-      console.log(error);
+    if (!req.file) {
+      throw new Error('No file uploaded');
     }
 
+    const newPost = new Post({
+      title: req.body.title,
+      image: req.file.filename,
+      body: req.body.body,
+      category: req.body.category 
+    });
+
+    await newPost.save();
+    res.redirect('/dashboard');
   } catch (error) {
     console.log(error);
+    res.redirect('/error')
   }
 });
 
 
-// Get dari Post
+/**
+ * GET /
+ * Admin - Create New Post
+*/
 router.get('/edit-post/:id', authMiddleware, async (req, res) => {
   try {
-
+    const locals = {
+      title: 'Edit Post',
+    };
 
     const data = await Post.findOne({ _id: req.params.id });
 
     res.render('admin/edit-post', {
+      locals,
+      user: req.session.user,
       data,
       layout: adminLayout
     })
@@ -168,52 +214,78 @@ router.get('/edit-post/:id', authMiddleware, async (req, res) => {
 });
 
 
-// put untuk Post
-router.put('/edit-post/:id', authMiddleware, async (req, res) => {
+/**
+ * PUT /
+ * Admin - Create New Post
+*/
+router.put('/edit-post/:id', authMiddleware,upload, async (req, res) => {
   try {
+    let id = req.params.id;
+    let new_image = '';
 
-    await Post.findByIdAndUpdate(req.params.id, {
+    if (req.file) {
+      new_image = req.file.filename;
+      try {
+        fs.unlinkSync('../uploads/' + req.body.old_image);
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      new_image = req.body.old_image;
+    }
+
+    await Post.findByIdAndUpdate(id, {
+      user: req.session.user,
       title: req.body.title,
+      image: new_image,
       body: req.body.body,
+      category: req.body.category,
       updatedAt: Date.now()
     });
 
+    req.session.message = {
+      type: 'success',
+      message: 'Post updated successfully!',
+    };
     res.redirect(`/dashboard`);
 
   } catch (error) {
     console.log(error);
+    res.json({ message: error.message, type: 'danger' });
   }
-
 });
 
-
-
-router.get('/register', async (req, res)=> {
-  res.render('admin/register', { layout: mainLayout });
+router.get('/register', (req,res) => {
+  const locals = {
+    title: 'Register',
+  }
+  res.render('admin/register', {
+    user: req.session.user,
+    locals,
+    layout: adminLayout
+  })
 })
 
-// Post Register
+/**
+ * POST /
+ * Admin - Register
+*/
 router.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
-    const role = 'user';
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Cek apakah username sudah ada dalam database
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      req.flash('error', 'Username telah dipakai');
-      return res.redirect('register'); // Ganti dengan path menuju halaman registrasi
-    }
-
     try {
-      const user = await User.create({ username, password: hashedPassword, role });
-      req.session.user = user; // Set req.session.user saat pengguna berhasil mendaftar
-      const token2 = jwt.sign({ userId: user._id }, jwtSecret);
-      res.cookie('token', token2, { httpOnly: true });
-      res.redirect('/admin');
+      const user = await User.create({ username, password:hashedPassword });
+      res.flash('success', 'User dibuat')
+      setTimeout(function() {
+        res.redirect('/admin'); 
+      }, 3000);
     } catch (error) {
-      res.status(500).json({ message: 'Internal server error' });
+      if(error.code === 11000) {
+        req.flash('error', 'Username sudah dipakai');
+      }
+      res.redirect('/register')
     }
 
   } catch (error) {
@@ -222,9 +294,10 @@ router.post('/register', async (req, res) => {
 });
 
 
-
-
-// Delete Post
+/**
+ * DELETE /
+ * Admin - Delete Post
+*/
 router.delete('/delete-post/:id', authMiddleware, async (req, res) => {
 
   try {
@@ -237,74 +310,17 @@ router.delete('/delete-post/:id', authMiddleware, async (req, res) => {
 });
 
 
-
-// Get Logout 
+/**
+ * GET /
+ * Admin Logout
+*/
 router.get('/logout', (req, res) => {
-  res.clearCookie('token');
-  req.session.destroy(err => {
-    if (err) {
-      console.error('Error destroying session:', err);
-      return res.status(500).json({ message: 'Internal server error' });
-    }
-    // Redirect ke halaman login atau halaman sebelumnya (jika ada)
-    res.redirect('/');
-  });
+  req.session.destroy(); // Clear the session data
+  res.clearCookie('token'); // Clear the token cookie
+  res.redirect('/');
 });
 
-// Route untuk halaman profile
-router.get('/profile', authMiddleware, async (req, res) => {
-  try {
-    const user = await User.findById(req.userId);
-    res.render('profile', { 
-      user,
-      currentRoute: '/profile', // tambahkan currentRoute ke dalam objek yang akan dirrender
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
 
-// Post untuk ganti username
-router.post('/update-username', authMiddleware, async (req, res) => {
-  try {
-    const { newUsername } = req.body;
-    const user = await User.findById(req.userId);
-    
-    // Periksa apakah pengguna ditemukan
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    
-    if (user.role === 'admin') {
-      console.log('Admin tidak dapat mengedit username.'); // sebagai tanda bahwa admin tidak bisa ganti username
-      return res.status(403).json({ message: 'Admin tidak dapat mengedit username.' });
-    }
-    // Jika newUsername adalah 'admin', kembalikan respons dengan pesan yang sesuai
-    if (newUsername.toLowerCase() === 'admin') {
-      console.log('Username tidak boleh "admin".'); // console log pesan bahwa username tidak boleh 'admin'
-      return res.status(403).json({ message: 'Username tidak boleh "admin".' });
-    }
-    
-    const existingUser = await User.findOne({ username: newUsername });
-    if (existingUser) {
-      console.log('Username sudah digunakan, silakan pilih username lain.'); // console log pesan bahwa username sudah digunakan
-      return res.status(409).json({ message: 'Username sudah digunakan, silakan pilih username lain.' });
-    }
-    // Perbarui username pengguna
-    user.username = newUsername;
-    await user.save();
-
-    console.log('Username updated successfully:', newUsername); 
-
-    // Kirim respons dengan data pengguna yang diperbarui
-    req.session.user.username = newUsername;
-    res.redirect('/profile');
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
 
 
 module.exports = router;
