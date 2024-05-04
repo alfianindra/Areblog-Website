@@ -208,7 +208,7 @@ textarea {
 }
 
 /* Header -> Navigation */
-.header__nav ul {
+.header__nav ul, .header_a_nav ul {
   list-style-type: none;
   display: flex;
   gap: 1rem;
@@ -216,7 +216,7 @@ textarea {
   padding: 0;
 }
 
-.header__nav ul a {
+.header__nav ul a, .header_a_nav ul a {
   padding: 10px;
   text-decoration: none;
 }
@@ -225,7 +225,7 @@ textarea {
   color: #7E7E7E;
 }
 
-.header__nav ul a:hover {
+.header__nav ul a:hover, .header_a_nav ul a:hover {
   text-decoration: underline;
 }
 
@@ -701,14 +701,59 @@ textarea {
   right: 0; /* Atur jarak dari kanan */
 }
 
-.profile {
-  padding: 10px 0;
+.member-profile {
   text-align: center;
 }
 
-.profile__heading {
-  margin-top: 10px;
-  margin-bottom: 5px;
+.member-profile img {
+  width: 150px;
+  height: auto;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+
+.page-wrap {
+  height: 100vh;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.error_container {
+  max-width: 960px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.display-1 {
+  font-size: 6rem;
+  display: block;
+}
+
+.d-block {
+  display: block;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+.lead {
+  font-size: 1.25rem;
+  font-weight: 300;
+}
+
+.error a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.error a:hover {
+  text-decoration: underline;
 }
 
 .alert {

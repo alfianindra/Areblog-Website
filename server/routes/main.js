@@ -7,6 +7,7 @@ const Comment = require('../models/Comment')
 
 const LoginLayout = '../views/layouts/login';
 const mainLayout = '../views/layouts/main';
+const errorLayout = '../views/layouts/error';
 
 const authComment = async (req, res, next) => {
   try {
@@ -17,22 +18,21 @@ const authComment = async (req, res, next) => {
 
     const userData = await User.findById(user);
     if (!userData) {
-      return res.status(401).json({ message: 'User data not found' });
+      return res.redirect('/admin')
     }
 
     req.user = userData; // Attach user object to request for future use
     next();
   } catch (error) {
-    console.error('Error in authentication middleware:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.redirect('/error')
   }
 }
 
-/**
- * GET /
- * HOME
-*/
+// Get Menu Home
 router.get('', async (req, res) => {
+  const locals = {
+    title: 'Areblog',
+  };
   try {
     let perPage = 5;
     let page = req.query.page || 1;
@@ -76,6 +76,7 @@ router.get('', async (req, res) => {
     const hasNextPage = page < Math.ceil(count / perPage);
 
     res.render('index', { 
+      locals,
       data,
       current: page,
       nextPage: hasNextPage ? parseInt(page) + 1 : null,
@@ -92,28 +93,12 @@ router.get('', async (req, res) => {
 
 });
 
-// router.get('', async (req, res) => {
-//   const locals = {
-//     title: "NodeJs Blog",
-//     description: "Simple Blog created with NodeJs, Express & MongoDb."
-//   }
-
-//   try {
-//     const data = await Post.find();
-//     res.render('index', { locals, data });
-//   } catch (error) {
-//     console.log(error);
-//   }
-
-// });
 
 
-/**
- * GET /
- * Post :id
-*/
+//Method Get Post:id
 router.get('/post/:id', async (req, res) => {
   try {
+
     let slug = req.params.id;
 
     // Fetch the post data
@@ -124,10 +109,10 @@ router.get('/post/:id', async (req, res) => {
 
     const locals = {
       title: postData.title,
-      description: "Simple Blog created with NodeJs, Express & MongoDb.",
     }
 
     res.render('post', { 
+      locals,
       user : req.session.user,
       layout: mainLayout, 
       postData,
@@ -137,20 +122,16 @@ router.get('/post/:id', async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    res.redirect('/error')
   }
 });
 
-/**
- * POST /
- * Post - searchTerm
-*/
+// Post Untuk Fitur Search
 router.post('/search', async (req, res) => {
   try {
     const locals = {
-      title: "Seach",
-      description: "Simple Blog created with NodeJs, Express & MongoDb."
-    }
+      title: 'Search',
+    };
 
     let searchTerm = req.body.searchTerm;
     const searchNoSpecialChar = searchTerm.replace(/[^a-zA-Z0-9 ]/g, "")
@@ -163,9 +144,11 @@ router.post('/search', async (req, res) => {
     });
 
     res.render("search", {
+      locals,
+      user,
       data,
       currentRoute: '/',
-      layout: LoginLayout
+      layout: mainLayout
     });
 
   } catch (error) {
@@ -180,17 +163,18 @@ router.post('/search', async (req, res) => {
  * About
 */
 router.get('/about', (req, res) => {
+  const locals = {
+    title: 'About',
+  };
   res.render('about', {
+    locals,
     currentRoute: '/about',
     user : req.session.user,
     layout: mainLayout
   });
 });
 
-/**
- * GET /comments
- * Get all comments
-*/
+// Method Get Pada tab Komen
 router.get('/comments/:id', async (req, res) => {
   try {
     const postId = req.params.id;
@@ -198,16 +182,12 @@ router.get('/comments/:id', async (req, res) => {
     res.render('comments', { comments }); // Render view and pass comments data
   } catch (error) {
     console.error('Error fetching comments:', error);
-    res.status(500).send('Internal server error');
+    res.redirect('/error')
   }
 });
 
 
-/**
- * POST /comments
- * Create a new comment
- * Requires authentication
-*/
+// Method Post Pada add-comment
 router.post('/add-comments', authComment, async (req, res) => {
   try {
     const { postId, text } = req.body;
@@ -215,10 +195,11 @@ router.post('/add-comments', authComment, async (req, res) => {
     // Pastikan postId, text, dan command tidak kosong atau undefined
     
     if (!postId ) {
-      return res.status(400).json({ message: 'postId, text, and command are required' });
+      return res.redirect('/admin')
     }
     if (!text ) {
-      return res.status(400).json({ message: ' text, are required' });
+     req.flash('error', 'Tidak ada text salah');
+     return res.redirect('back')
     } 
     
     const createdBy = req.user._id; // Mengambil ID pengguna dari objek User
@@ -233,11 +214,11 @@ router.post('/add-comments', authComment, async (req, res) => {
     res.redirect('back');
   } catch (error) {
     console.error('Error creating comment:', error);
-    res.status(400).json({ message: 'Bad request', error: error.message });
+    res.redirect('/error')
   }
 });
 
-// PUT route for updating a comment by ID
+// Method Put untuk update comment 
 router.put('/update-comments/:id', authComment, async (req, res) => {
   try {
     const { id } = req.params;
@@ -245,12 +226,12 @@ router.put('/update-comments/:id', authComment, async (req, res) => {
 
     const comment = await Comment.findById(id);
     if (!comment) {
-      return res.status(404).json({ message: 'Comment not found' });
+      return res.redirect('/error')
     }
 
     // Check if the logged-in user is the creator of the comment
     if (comment.createdBy._id.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Unauthorized to edit this comment' });
+      return res.flash('error', 'tidak memiliki hak untuk edit komen ini');
     }
 
     comment.text = text;
@@ -260,26 +241,23 @@ router.put('/update-comments/:id', authComment, async (req, res) => {
     res.redirect('back');
   } catch (error) {
     console.error('Error updating comment:', error);
-    res.status(400).json({ message: 'Bad request' });
+    res.redirect('/error')
   }
 });
 
 
 
-// DELETE route for deleting comment
+// Method delete untuk comment
 router.delete('/delete-comments/:id', authComment, async (req, res) => {
   try {
     const { id } = req.params;
 
 
     const comment = await Comment.findById(id);
-    // if (!comment) {
-    //   return res.status(404).json({ message: 'Comment not found' });
-    // }
 
     // Check if the logged-in user is the creator of the comment
     if (comment.createdBy._id.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Unauthorized to delete this comment' });
+      return res.flash('error', 'tidak memiliki hak untuk delete komen ini');
     }
 
     await Comment.deleteOne({ _id: id }); // Use Comment.deleteOne() to delete the comment
@@ -287,11 +265,16 @@ router.delete('/delete-comments/:id', authComment, async (req, res) => {
     res.redirect('back')
   } catch (error) {
     console.error('Error deleting comment:', error);
-    res.status(400).json({ message: 'Bad request' });
+    res.redirect('/error')
   }
 });
 
-
-
+//Method Get untuk page error
+router.get('/error', (req, res) => {
+  const locals = {
+    title: 'Internal server error',
+  };
+  res.render('error', {layout: errorLayout , locals})
+})
 
 module.exports = router;
