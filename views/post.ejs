@@ -1,2 +1,47 @@
-<h1><%= data.title %></h1>
-<article class="article"><%= data.body %></article>
+<center>
+<h1><%= postData.title %></h1>
+<% if (postData.image) { %>
+    <img src='/uploads/<%=postData.image%>' class="img-thumbnail" alt="">
+  <% } else { %>
+    <p>No image available</p>
+  <% } %>
+  
+<article class="article"><%= postData.body %></article> 
+
+<form action="/add-comments" method="POST">
+  <input type="hidden" name="postId" value="<%= postData._id %>"> <!-- Include post ID -->
+  <textarea name="text" placeholder="Write your comment"></textarea>
+  <button type="submit">Add Comment</button>
+</form>
+
+<!-- Display Existing Comments -->
+
+
+
+<% comments.forEach(comment => { %>
+  <div class="comment">
+    <p><strong><%= comment.createdBy.username %></strong> - <%= comment.createdAt.toLocaleString() %></p>
+    <p><%= comment.text %></p>
+    <% if (user && user._id) { %>
+
+    <% if (comment.createdBy.id === user._id) { %>
+      <form action="/update-comments/<%= comment._id %>?_method=PUT" method="POST">
+        <input type="hidden" name="update" value="PUT"> <!-- For method override in Express -->
+        <textarea name="text"><%= comment.text %></textarea>
+        <button type="submit" value="Update">Update Comment</button>
+      </form>
+
+      <form action="/delete-comments/<%= comment._id %>?_method=DELETE" method="POST">
+        <input type="hidden" name="Delete" value="DELETE"> <!-- For method override in Express -->
+        <button type="submit">Delete Comment</button>
+      </form>
+    <% } %>
+    
+    <% } %>
+  </div>
+<% }) %>
+
+
+
+
+</center>
