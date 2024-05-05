@@ -271,7 +271,7 @@ router.delete('/delete-comments/:id', authComment, async (req, res) => {
 });
 
 //Method Get untuk page error
-router.get('/error', (req, res) => {
+router.get('*', (req, res) => {
   const locals = {
     title: 'Internal server error',
   };
