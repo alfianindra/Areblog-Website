@@ -146,7 +146,7 @@ router.post('/search', async (req, res) => {
 
     res.render("search", {
       locals,
-      user,
+      user : req.session.user,
       data,
       currentRoute: '/',
       layout: mainLayout
