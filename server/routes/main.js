@@ -7,7 +7,7 @@ const Comment = require('../models/Comment')
 
 const LoginLayout = '../views/layouts/login';
 const mainLayout = '../views/layouts/main';
-const errorLayout = '../views/layouts/error';
+
 
 const authComment = async (req, res, next) => {
   try {
@@ -270,12 +270,6 @@ router.delete('/delete-comments/:id', authComment, async (req, res) => {
   }
 });
 
-//Method Get untuk page error
-router.get('*', (req, res) => {
-  const locals = {
-    title: 'Internal server error',
-  };
-  res.render('error', {layout: errorLayout , locals})
-})
+
 
 module.exports = router;

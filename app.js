@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const flash = require('express-flash');
+const errorLayout = '../views/layouts/error';
 
 const connectDB = require('./server/config/db');
 const { isActiveRoute } = require('./server/helpers/routeHelpers');
@@ -44,9 +45,18 @@ app.set('view engine', 'ejs');
 app.locals.isActiveRoute = isActiveRoute; 
 
 
+
 app.use('/', require('./server/routes/main'));
 app.use('/', require('./server/routes/admin'));
 
 app.listen(PORT, ()=> {
   console.log(`App listening on port ${PORT}`);
 });
+
+//Method Get untuk page error
+app.get('*', (req, res) => {
+  const locals = {
+    title: 'Internal server error',
+  };
+  res.render('error', {layout: errorLayout , locals})
+})
