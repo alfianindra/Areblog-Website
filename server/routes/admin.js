@@ -253,6 +253,7 @@ router.post('/register', async (req, res) => {
     }
     
     try {
+      const role = 'user';
       const user = await User.create({ username, password: hashedPassword, role });
       req.session.user = user; // Set req.session.user saat pengguna berhasil mendaftar
       const token2 = jwt.sign({ userId: user._id }, jwtSecret);

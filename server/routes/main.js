@@ -72,7 +72,8 @@ router.get('', async (req, res) => {
       { $match: filter },
       { $count: "count" }
     ];
-    const [{ count }] = await Post.aggregate(countPipeline);
+    const countResult = await Post.aggregate(countPipeline);
+    const count = countResult.length > 0 ? countResult[0].count : 0; // Periksa apakah hasil tidak kosong dan mengandung properti count
     const hasNextPage = page < Math.ceil(count / perPage);
 
     res.render('index', { 
